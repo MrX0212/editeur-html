@@ -11,8 +11,7 @@
       --text-dark: #fff;
       --code-bg-light: #e6f0ff;
       --code-bg-dark: #1e1e1e;
-      --button-bg: white;
-      --button-color: #007bff;
+      --primary: #007bff;
     }
 
     body {
@@ -64,7 +63,7 @@
       flex-wrap: wrap;
       gap: 10px;
       padding: 10px;
-      background: #007bff;
+      background: var(--primary);
     }
 
     button {
@@ -72,8 +71,8 @@
       font-size: 16px;
       border: none;
       border-radius: 6px;
-      background: var(--button-bg);
-      color: var(--button-color);
+      background: white;
+      color: var(--primary);
       cursor: pointer;
     }
 
@@ -102,12 +101,14 @@
       <input type="file" id="import" accept=".html" onchange="importFile(event)">
     </label>
     <button onclick="toggleTheme()">🌓 Mode Sombre</button>
+    <button onclick="logout()">🚪 Déconnexion</button>
   </div>
 
   <script>
+    // Vérifie si l'utilisateur est connecté
     const user = localStorage.getItem("currentUser");
     if (!user) {
-      alert("Connecte-toi pour utiliser l’éditeur.");
+      alert("Tu dois être connecté pour utiliser l’éditeur.");
       location.href = "index1.html";
     }
 
@@ -138,10 +139,15 @@
       reader.readAsText(file);
     }
 
-    // Thème sombre / clair
     function toggleTheme() {
       document.body.classList.toggle("dark");
       localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+
+    function logout() {
+      localStorage.removeItem("currentUser");
+      alert("Tu es déconnecté !");
+      location.href = "index1.html";
     }
 
     // Appliquer le thème au chargement
@@ -149,13 +155,13 @@
       document.body.classList.add("dark");
     }
 
-    // Charger le code précédemment sauvegardé
+    // Charger le code sauvegardé
     const savedCode = localStorage.getItem("saved_" + user);
     if (savedCode) {
       textarea.value = savedCode;
     }
+
     run();
   </script>
 </body>
 </html>
-
