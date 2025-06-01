@@ -1,66 +1,157 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Connexion</title>
+  <meta charset="UTF-8" />
+  <title>Éditeur HTML</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
       height: 100vh;
-      background-color: #f5f5f5;
+      font-family: monospace;
+      background-color: white;
     }
-    input, button {
-      margin: 5px;
+    #top {
+      display: flex;
+      flex: 1;
+    }
+    textarea {
+      width: 50%;
+      height: 100%;
+      padding: 10px;
+      border: none;
+      resize: none;
+      outline: none;
+      background-color: #f9f9f9;
+      color: #000;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    iframe {
+      width: 50%;
+      height: 100%;
+      border: none;
+      background-color: white;
+    }
+    #buttons {
+      display: flex;
+      justify-content: center;
+      background: #eee;
+      padding: 5px;
+    }
+    button {
       padding: 10px;
       font-size: 16px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      margin: 0 5px;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    #logout {
+      background: #f44336;
+    }
+    #logout:hover {
+      background: #da190b;
+    }
+    input[type="file"] {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>Connexion à l'Éditeur</h1>
-  <input type="text" id="username" placeholder="Nom d'utilisateur">
-  <input type="password" id="password" placeholder="Mot de passe">
-  <div>
-    <button onclick="login()">Se connecter</button>
-    <button onclick="register()">Créer un compte</button>
+
+  <div id="top">
+    <textarea id="code" oninput="update()">
+<!-- Tape ton code HTML ici -->
+<h1>Bienvenue !</h1>
+<p>Aperçu à droite.</p>
+    </textarea>
+    <iframe id="preview"></iframe>
   </div>
+
+  <div id="buttons">
+    <button onclick="run()">▶️ Exécuter</button>
+    <button onclick="download()">📥 Télécharger</button>
+    <button id="btnImport">📂 Importer fichier HTML</button>
+    <button id="logout">Se déconnecter</button>
+    <input type="file" id="fileInput" accept=".html,text/html" />
+  </div>
+
   <script>
-    function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      const stored = localStorage.getItem("user_" + username);
-      if (stored) {
-        const userData = JSON.parse(stored);
-        if (userData.password === password) {
-          localStorage.setItem("currentUser", username);
-          window.location.href = "editor.html";
-        } else {
-          alert("Mot de passe incorrect.");
-        }
-      } else {
-        alert("Utilisateur non trouvé.");
+    // Vérifier connexion
+    if(!localStorage.getItem("currentUser")) {
+      alert("Vous devez être connecté pour accéder à l’éditeur.");
+      window.location.href = "index.html";
+    }
+
+    const codeArea = document.getElementById("code");
+    const preview = document.getElementById("preview");
+    const fileInput = document.getElementById("fileInput");
+    const btnImport = document.getElementById("btnImport");
+
+    function update() {
+      preview.srcdoc = codeArea.value;
+      const user = localStorage.getItem("currentUser");
+      if(user) {
+        localStorage.setItem("code_" + user, codeArea.value);
       }
     }
 
-    function register() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      if (username && password) {
-        if (localStorage.getItem("user_" + username)) {
-          alert("Ce nom d'utilisateur est déjà utilisé.");
-        } else {
-          localStorage.setItem("user_" + username, JSON.stringify({ password, code: "" }));
-          alert("Compte créé ! Vous pouvez maintenant vous connecter.");
-        }
-      } else {
-        alert("Veuillez remplir tous les champs.");
-      }
+    function run() {
+      preview.srcdoc = codeArea.value;
     }
+
+    function download() {
+      const blob = new Blob([codeArea.value], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'mon-code.html';
+      a.click();
+    }
+
+    window.onload = () => {
+      const user = localStorage.getItem("currentUser");
+      if(user) {
+        const saved = localStorage.getItem("code_" + user);
+        if(saved) {
+          codeArea.value = saved;
+          run();
+        }
+      }
+    };
+
+    document.getElementById("logout").onclick = () => {
+      localStorage.removeItem("currentUser");
+      window.location.href = "index.html";
+    };
+
+    btnImport.onclick = () => {
+      fileInput.click();
+    };
+
+    fileInput.onchange = () => {
+      const file = fileInput.files[0];
+      if(!file) return;
+
+      if(file.type !== "text/html" && !file.name.endsWith(".html")) {
+        alert("Veuillez choisir un fichier HTML valide.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        codeArea.value = e.target.result;
+        update();
+      };
+      reader.readAsText(file);
+    };
   </script>
+
 </body>
 </html>
