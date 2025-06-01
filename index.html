@@ -4,59 +4,103 @@
   <meta charset="UTF-8">
   <title>Connexion</title>
   <style>
-    body {
-      font-family: sans-serif;
-      background-color: #f0f0f0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+    :root {
+      --blue: #007BFF;
+      --blue-dark: #0056b3;
+      --bg: #f0f8ff;
+      --text: #333;
     }
-    input, button {
-      padding: 10px;
-      margin: 5px;
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: var(--text);
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: var(--blue-dark);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       font-size: 16px;
     }
-    #message {
-      color: red;
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--blue-dark);
+    }
+
+    small {
+      display: block;
+      margin-top: 10px;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <h2>Connexion / Création de compte</h2>
-  <input type="text" id="username" placeholder="Nom d'utilisateur"><br>
-  <input type="password" id="password" placeholder="Mot de passe"><br>
-  <button onclick="login()">Se connecter</button>
-  <p id="message"></p>
+  <div class="container">
+    <h1>Connexion</h1>
+    <input type="text" id="username" placeholder="Nom d'utilisateur">
+    <input type="password" id="password" placeholder="Mot de passe">
+    <button onclick="login()">Se connecter / Créer un compte</button>
+    <small>Vous devez avoir un compte pour accéder à l’éditeur HTML.</small>
+  </div>
 
   <script>
     function login() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
 
       if (!user || !pass) {
-        document.getElementById("message").textContent = "Remplis les deux champs.";
+        alert("Remplis tous les champs !");
         return;
       }
 
-      const saved = localStorage.getItem("users");
-      let users = saved ? JSON.parse(saved) : {};
+      const key = "user_" + user;
+      const savedPass = localStorage.getItem(key);
 
-      if (users[user]) {
-        if (users[user] === pass) {
-          localStorage.setItem("currentUser", user);
-          window.location.href = "index2.html";
-        } else {
-          document.getElementById("message").textContent = "Mot de passe incorrect.";
-        }
-      } else {
-        users[user] = pass;
-        localStorage.setItem("users", JSON.stringify(users));
-        localStorage.setItem("scripts_" + user, ""); // Sauvegarde vide au début
-        localStorage.setItem("currentUser", user);
-        window.location.href = "index2.html";
+      if (!savedPass) {
+        localStorage.setItem(key, pass);
+        alert("Compte créé !");
+      } else if (savedPass !== pass) {
+        alert("Mot de passe incorrect !");
+        return;
       }
+
+      localStorage.setItem("currentUser", user);
+      window.location.href = "index2.html";
     }
   </script>
 </body>
