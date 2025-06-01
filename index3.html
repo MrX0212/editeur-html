@@ -1,39 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Éditeur HTML</title>
   <style>
-    :root {
-      --bg-light: #f0f8ff;
-      --bg-dark: #121212;
-      --text-light: #000;
-      --text-dark: #fff;
-      --code-bg-light: #e6f0ff;
-      --code-bg-dark: #1e1e1e;
-      --primary: #007bff;
-    }
-
     body {
+      font-family: monospace;
       margin: 0;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      font-family: monospace;
-      background-color: var(--bg-light);
-      color: var(--text-light);
+      background: linear-gradient(135deg, #007BFF, #00D4FF);
+      color: white;
     }
-
-    body.dark {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
-
     #top {
-      display: flex;
       flex: 1;
+      display: flex;
+      border: 2px solid white;
+      margin: 10px;
+      border-radius: 10px;
+      overflow: hidden;
     }
-
     textarea {
       width: 50%;
       height: 100%;
@@ -41,45 +28,37 @@
       border: none;
       resize: none;
       outline: none;
-      background-color: var(--code-bg-light);
-      color: inherit;
+      background-color: rgba(255,255,255,0.9);
+      color: #007BFF;
+      font-size: 16px;
     }
-
-    body.dark textarea {
-      background-color: var(--code-bg-dark);
-      color: var(--text-dark);
-    }
-
     iframe {
       width: 50%;
       height: 100%;
       border: none;
       background-color: white;
     }
-
     #controls {
+      padding: 15px;
+      background: rgba(0,0,0,0.15);
       display: flex;
+      gap: 15px;
       justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 10px;
-      background: var(--primary);
+      align-items: center;
     }
-
-    button {
-      padding: 10px 20px;
+    button, label button {
+      padding: 12px 25px;
       font-size: 16px;
       border: none;
-      border-radius: 6px;
-      background: white;
-      color: var(--primary);
+      border-radius: 8px;
       cursor: pointer;
+      background: white;
+      color: #007BFF;
+      transition: background-color 0.3s;
     }
-
-    button:hover {
-      background: #e0e0e0;
+    button:hover, label button:hover {
+      background-color: #cce6ff;
     }
-
     input[type="file"] {
       display: none;
     }
@@ -89,31 +68,36 @@
   <div id="top">
     <textarea id="code"><!-- Tape ton code HTML ici -->
 <h1>Bienvenue !</h1>
-<p>Aperçu à droite.</p></textarea>
+<p>Aperçu à droite.</p>
+    </textarea>
     <iframe id="preview"></iframe>
   </div>
-
   <div id="controls">
     <button onclick="run()">▶️ Run</button>
     <button onclick="download()">📥 Télécharger</button>
     <label>
-      <button>📂 Importer</button>
+      <button type="button">📂 Importer</button>
       <input type="file" id="import" accept=".html" onchange="importFile(event)">
     </label>
-    <button onclick="toggleTheme()">🌓 Mode Sombre</button>
     <button onclick="logout()">🚪 Déconnexion</button>
   </div>
 
   <script>
-    // Vérifie si l'utilisateur est connecté
+    // Vérifier si utilisateur connecté sinon rediriger
     const user = localStorage.getItem("currentUser");
     if (!user) {
-      alert("Tu dois être connecté pour utiliser l’éditeur.");
-      location.href = "index.html"; // redirection vers page d'accueil
+      alert("Tu dois être connecté !");
+      location.href = "index.html";
     }
 
     const textarea = document.getElementById("code");
     const preview = document.getElementById("preview");
+
+    // Charger code sauvegardé si existe
+    const savedCode = localStorage.getItem("saved_" + user);
+    if (savedCode) {
+      textarea.value = savedCode;
+    }
 
     function run() {
       preview.srcdoc = textarea.value;
@@ -139,28 +123,13 @@
       reader.readAsText(file);
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-    }
-
     function logout() {
       localStorage.removeItem("currentUser");
-      alert("Tu es déconnecté !");
+      alert("Déconnecté !");
       location.href = "index.html";
     }
 
-    // Appliquer le thème au chargement
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-    }
-
-    // Charger le code sauvegardé
-    const savedCode = localStorage.getItem("saved_" + user);
-    if (savedCode) {
-      textarea.value = savedCode;
-    }
-
+    // Run initial pour afficher le code sauvegardé ou le contenu par défaut
     run();
   </script>
 </body>
