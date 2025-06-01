@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Éditeur HTML</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      font-family: monospace;
+    }
+    #top {
+      display: flex;
+      flex: 1;
+    }
+    textarea {
+      width: 50%;
+      height: 100%;
+      padding: 10px;
+      border: none;
+      resize: none;
+      outline: none;
+      background-color: #f9f9f9;
+      color: #000;
+    }
+    iframe {
+      width: 50%;
+      height: 100%;
+      border: none;
+      background-color: white;
+    }
+    button {
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div id="top">
+    <textarea id="code" oninput="update()"></textarea>
+    <iframe id="preview"></iframe>
+  </div>
+  <div>
+    <button onclick="download()">📥 Télécharger</button>
+    <button onclick="importFile()">📂 Importer</button>
+    <button onclick="logout()">🔒 Déconnexion</button>
+  </div>
+  <input type="file" id="fileInput" style="display:none"/>
+
+  <script>
+    if (!localStorage.getItem("currentUser")) {
+      alert("Vous devez être connecté pour utiliser l'éditeur.");
+      window.location.href = "index.html";
+    }
+
+    const currentUser = localStorage.getItem("currentUser");
+    const codeArea = document.getElementById("code");
+
+    function update() {
+      const code = codeArea.value;
+      document.getElementById("preview").srcdoc = code;
+      const userData = JSON.parse(localStorage.getItem("user_" + currentUser));
+      userData.code = code;
+      localStorage.setItem("user_" + currentUser, JSON.stringify(userData));
+    }
+
+    function download() {
+      const code = codeArea.value;
+      const blob = new Blob([code], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'mon-code.html';
+      a.click();
+    }
+
+    function logout() {
+      localStorage.removeItem("currentUser");
+      window.location.href = "index.html";
+    }
+
+    function importFile() {
+      document.getElementById("fileInput").click();
+    }
+
+    document.getElementById("fileInput").addEventListener("change", function () {
+      const file = this.files[0];
+      const reader = new FileReader();
+      reader.onload = function () {
+        codeArea.value = reader.result;
+        update();
+      };
+      if (file) reader.readAsText(file);
+    });
+
+    // Chargement du code sauvegardé
+    window.onload = () => {
+      const savedData = JSON.parse(localStorage.getItem("user_" + currentUser));
+      codeArea.value = savedData?.code || "<!-- Commence ici -->\n";
+      update();
+    };
+  </script>
+</body>
+</html>
