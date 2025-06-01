@@ -12,6 +12,11 @@
       height: 100vh;
       background: linear-gradient(135deg, #007BFF, #00D4FF);
       color: white;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: #121212;
+      color: #ddd;
     }
     #top {
       flex: 1;
@@ -20,6 +25,10 @@
       margin: 10px;
       border-radius: 10px;
       overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    body.dark #top {
+      border-color: #555;
     }
     textarea {
       width: 50%;
@@ -31,12 +40,21 @@
       background-color: rgba(255,255,255,0.9);
       color: #007BFF;
       font-size: 16px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark textarea {
+      background-color: #222;
+      color: #4CAF50;
     }
     iframe {
       width: 50%;
       height: 100%;
       border: none;
       background-color: white;
+      transition: background-color 0.3s;
+    }
+    body.dark iframe {
+      background-color: #1e1e1e;
     }
     #controls {
       padding: 15px;
@@ -44,9 +62,8 @@
       display: flex;
       gap: 15px;
       justify-content: center;
-      align-items: center;
     }
-    button, label button {
+    button {
       padding: 12px 25px;
       font-size: 16px;
       border: none;
@@ -54,13 +71,17 @@
       cursor: pointer;
       background: white;
       color: #007BFF;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, color 0.3s;
     }
-    button:hover, label button:hover {
+    button:hover {
       background-color: #cce6ff;
     }
-    input[type="file"] {
-      display: none;
+    body.dark button {
+      background: #333;
+      color: #4CAF50;
+    }
+    body.dark button:hover {
+      background-color: #555;
     }
   </style>
 </head>
@@ -75,10 +96,7 @@
   <div id="controls">
     <button onclick="run()">▶️ Run</button>
     <button onclick="download()">📥 Télécharger</button>
-    <label>
-      <button type="button">📂 Importer</button>
-      <input type="file" id="import" accept=".html" onchange="importFile(event)">
-    </label>
+    <button id="toggleThemeBtn">🌙 Mode sombre</button>
     <button onclick="logout()">🚪 Déconnexion</button>
   </div>
 
@@ -92,11 +110,18 @@
 
     const textarea = document.getElementById("code");
     const preview = document.getElementById("preview");
+    const toggleThemeBtn = document.getElementById("toggleThemeBtn");
 
     // Charger code sauvegardé si existe
     const savedCode = localStorage.getItem("saved_" + user);
     if (savedCode) {
       textarea.value = savedCode;
+    }
+
+    // Charger thème sauvegardé
+    if(localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+      toggleThemeBtn.textContent = "☀️ Mode clair";
     }
 
     function run() {
@@ -112,24 +137,25 @@
       a.click();
     }
 
-    function importFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        textarea.value = e.target.result;
-        run();
-      };
-      reader.readAsText(file);
-    }
-
     function logout() {
       localStorage.removeItem("currentUser");
       alert("Déconnecté !");
       location.href = "index.html";
     }
 
-    // Run initial pour afficher le code sauvegardé ou le contenu par défaut
+    toggleThemeBtn.addEventListener("click", () => {
+      if(document.body.classList.contains("dark")) {
+        document.body.classList.remove("dark");
+        toggleThemeBtn.textContent = "🌙 Mode sombre";
+        localStorage.setItem("theme", "light");
+      } else {
+        document.body.classList.add("dark");
+        toggleThemeBtn.textContent = "☀️ Mode clair";
+        localStorage.setItem("theme", "dark");
+      }
+    });
+
+    // Run initial
     run();
   </script>
 </body>
