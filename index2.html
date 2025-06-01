@@ -1,1 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Éditeur HTML</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      font-family: monospace;
+      background-color: white;
+    }
+    #top {
+      display: flex;
+      flex: 1;
+    }
+    textarea {
+      width: 50%;
+      height: 100%;
+      padding: 10px;
+      border: none;
+      resize: none;
+      outline: none;
+      background-color: #f9f9f9;
+      color: #000;
+    }
+    iframe {
+      width: 50%;
+      height: 100%;
+      border: none;
+    }
+    button {
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    #buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="top">
+    <textarea id="code"></textarea>
+    <iframe id="preview"></iframe>
+  </div>
+  <div id="buttons">
+    <button onclick="run()">▶️ Run</button>
+    <button onclick="download()">📥 Télécharger</button>
+    <button onclick="importFile()">📤 Importer</button>
+    <button onclick="toggleTheme()">🌓 Thème</button>
+    <button onclick="logout()">🚪 Déconnexion</button>
+  </div>
+
+  <input type="file" id="importInput" style="display:none">
+
+  <script>
+    const textarea = document.getElementById("code");
+    const currentUser = localStorage.getItem("currentUser");
+    const preview = document.getElementById("preview");
+    const fileInput = document.getElementById("importInput");
+
+    if (!currentUser) {
+      alert("Connecte-toi d'abord !");
+      window.location.href = "index.html";
+    } else {
+      const saved = localStorage.getItem("scripts_" + currentUser);
+      if (saved) textarea.value = saved;
+      run(); // afficher au démarrage
+    }
+
+    function run() {
+      const code = textarea.value;
+      preview.srcdoc = code;
+      if (currentUser) {
+        localStorage.setItem("scripts_" + currentUser, code);
+      }
+    }
+
+    function download() {
+      const blob = new Blob([textarea.value], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'mon-code.html';
+      a.click();
+    }
+
+    function importFile() {
+      fileInput.click();
+    }
+
+    fileInput.addEventListener('change', function() {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        textarea.value = e.target.result;
+        run();
+      };
+      reader.readAsText(file);
+    });
+
+    let dark = false;
+    function toggleTheme() {
+      dark = !dark;
+      document.body.style.backgroundColor = dark ? "#111" : "white";
+      textarea.style.backgroundColor = dark ? "#222" : "#f9f9f9";
+      textarea.style.color = dark ? "#eee" : "#000";
+    }
+
+    function logout() {
+      localStorage.removeItem("currentUser");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
 
