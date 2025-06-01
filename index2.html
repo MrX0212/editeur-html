@@ -2,51 +2,104 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Éditeur HTML</title>
+  <title>Éditeur HTML - Bleu</title>
   <style>
+    :root {
+      --bg-light: #f0f8ff;
+      --bg-dark: #0d1b2a;
+      --blue: #007BFF;
+      --blue-dark: #0056b3;
+      --text-light: #ffffff;
+      --text-dark: #000000;
+    }
+
     body {
       margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      font-family: monospace;
-      background-color: white;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      transition: all 0.3s ease;
     }
+
     #top {
-      display: flex;
       flex: 1;
+      display: flex;
+      height: 100%;
     }
+
     textarea {
       width: 50%;
       height: 100%;
-      padding: 10px;
       border: none;
       resize: none;
-      outline: none;
-      background-color: #f9f9f9;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 16px;
+      background-color: #e6f0ff;
       color: #000;
+      outline: none;
+      transition: all 0.3s ease;
     }
+
     iframe {
       width: 50%;
       height: 100%;
       border: none;
+      background-color: white;
     }
-    button {
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      background: #4CAF50;
-      color: white;
-      cursor: pointer;
-      margin: 5px;
-    }
-    button:hover {
-      background: #45a049;
-    }
+
     #buttons {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      padding: 10px;
+      background-color: var(--blue);
+    }
+
+    button {
+      background-color: var(--blue);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--blue-dark);
+    }
+
+    .dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+    }
+
+    .dark-mode textarea {
+      background-color: #102841;
+      color: #fff;
+    }
+
+    .dark-mode #buttons {
+      background-color: #144e9b;
+    }
+
+    .dark-mode button {
+      background-color: #2176ff;
+    }
+
+    .dark-mode button:hover {
+      background-color: #175dd1;
+    }
+
+    input[type="file"] {
+      display: none;
     }
   </style>
 </head>
@@ -63,13 +116,13 @@
     <button onclick="logout()">🚪 Déconnexion</button>
   </div>
 
-  <input type="file" id="importInput" style="display:none">
+  <input type="file" id="importInput">
 
   <script>
     const textarea = document.getElementById("code");
-    const currentUser = localStorage.getItem("currentUser");
     const preview = document.getElementById("preview");
     const fileInput = document.getElementById("importInput");
+    const currentUser = localStorage.getItem("currentUser");
 
     if (!currentUser) {
       alert("Connecte-toi d'abord !");
@@ -77,15 +130,13 @@
     } else {
       const saved = localStorage.getItem("scripts_" + currentUser);
       if (saved) textarea.value = saved;
-      run(); // afficher au démarrage
+      run();
     }
 
     function run() {
       const code = textarea.value;
       preview.srcdoc = code;
-      if (currentUser) {
-        localStorage.setItem("scripts_" + currentUser, code);
-      }
+      localStorage.setItem("scripts_" + currentUser, code);
     }
 
     function download() {
@@ -100,22 +151,20 @@
       fileInput.click();
     }
 
-    fileInput.addEventListener('change', function() {
+    fileInput.addEventListener('change', function () {
       const file = fileInput.files[0];
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         textarea.value = e.target.result;
         run();
       };
       reader.readAsText(file);
     });
 
-    let dark = false;
+    let isDark = false;
     function toggleTheme() {
-      dark = !dark;
-      document.body.style.backgroundColor = dark ? "#111" : "white";
-      textarea.style.backgroundColor = dark ? "#222" : "#f9f9f9";
-      textarea.style.color = dark ? "#eee" : "#000";
+      document.body.classList.toggle('dark-mode');
+      isDark = !isDark;
     }
 
     function logout() {
@@ -125,4 +174,3 @@
   </script>
 </body>
 </html>
-
