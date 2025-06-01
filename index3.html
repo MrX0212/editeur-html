@@ -109,7 +109,7 @@
     const user = localStorage.getItem("currentUser");
     if (!user) {
       alert("Tu dois être connecté pour utiliser l’éditeur.");
-      location.href = "index1.html";
+      location.href = "index.html"; // redirection vers page d'accueil
     }
 
     const textarea = document.getElementById("code");
@@ -147,7 +147,7 @@
     function logout() {
       localStorage.removeItem("currentUser");
       alert("Tu es déconnecté !");
-      location.href = "index1.html";
+      location.href = "index.html";
     }
 
     // Appliquer le thème au chargement
