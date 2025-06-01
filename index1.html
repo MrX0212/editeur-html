@@ -2,174 +2,49 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Éditeur HTML - Bleu</title>
+  <title>Connexion</title>
   <style>
-    :root {
-      --bg-light: #f0f8ff;
-      --bg-dark: #0d1b2a;
-      --blue: #007BFF;
-      --blue-dark: #0056b3;
-      --text-light: #ffffff;
-      --text-dark: #000000;
-    }
-
     body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: sans-serif;
+      background: #e6f0ff;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      background-color: var(--bg-light);
-      color: var(--text-dark);
-      transition: all 0.3s ease;
-    }
-
-    #top {
-      flex: 1;
-      display: flex;
-      height: 100%;
-    }
-
-    textarea {
-      width: 50%;
-      height: 100%;
-      border: none;
-      resize: none;
-      padding: 16px;
-      font-family: monospace;
-      font-size: 16px;
-      background-color: #e6f0ff;
-      color: #000;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    iframe {
-      width: 50%;
-      height: 100%;
-      border: none;
-      background-color: white;
-    }
-
-    #buttons {
-      display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       justify-content: center;
-      padding: 10px;
-      background-color: var(--blue);
+      height: 100vh;
     }
-
-    button {
-      background-color: var(--blue);
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      margin: 5px;
+    input, button {
+      padding: 12px;
+      margin: 10px;
+      width: 250px;
       font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      transition: background-color 0.3s ease;
     }
-
-    button:hover {
-      background-color: var(--blue-dark);
-    }
-
-    .dark-mode {
-      background-color: var(--bg-dark);
-      color: var(--text-light);
-    }
-
-    .dark-mode textarea {
-      background-color: #102841;
-      color: #fff;
-    }
-
-    .dark-mode #buttons {
-      background-color: #144e9b;
-    }
-
-    .dark-mode button {
-      background-color: #2176ff;
-    }
-
-    .dark-mode button:hover {
-      background-color: #175dd1;
-    }
-
-    input[type="file"] {
-      display: none;
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-  <div id="top">
-    <textarea id="code"></textarea>
-    <iframe id="preview"></iframe>
-  </div>
-  <div id="buttons">
-    <button onclick="run()">▶️ Run</button>
-    <button onclick="download()">📥 Télécharger</button>
-    <button onclick="importFile()">📤 Importer</button>
-    <button onclick="toggleTheme()">🌓 Thème</button>
-    <button onclick="logout()">🚪 Déconnexion</button>
-  </div>
-
-  <input type="file" id="importInput">
+  <h2>Connexion</h2>
+  <input type="text" id="username" placeholder="Nom d'utilisateur">
+  <input type="password" id="password" placeholder="Mot de passe">
+  <button onclick="login()">Se connecter</button>
 
   <script>
-    const textarea = document.getElementById("code");
-    const preview = document.getElementById("preview");
-    const fileInput = document.getElementById("importInput");
-    const currentUser = localStorage.getItem("currentUser");
+    function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const saved = localStorage.getItem("user_" + user);
 
-    if (!currentUser) {
-      alert("Connecte-toi d'abord !");
-      window.location.href = "index.html";
-    } else {
-      const saved = localStorage.getItem("scripts_" + currentUser);
-      if (saved) textarea.value = saved;
-      run();
-    }
+      if (!user || !pass) return alert("Remplis tous les champs.");
+      if (!saved) return alert("Compte inexistant.");
+      if (saved !== pass) return alert("Mot de passe incorrect.");
 
-    function run() {
-      const code = textarea.value;
-      preview.srcdoc = code;
-      localStorage.setItem("scripts_" + currentUser, code);
-    }
-
-    function download() {
-      const blob = new Blob([textarea.value], { type: 'text/html' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'mon-code.html';
-      a.click();
-    }
-
-    function importFile() {
-      fileInput.click();
-    }
-
-    fileInput.addEventListener('change', function () {
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        textarea.value = e.target.result;
-        run();
-      };
-      reader.readAsText(file);
-    });
-
-    let isDark = false;
-    function toggleTheme() {
-      document.body.classList.toggle('dark-mode');
-      isDark = !isDark;
-    }
-
-    function logout() {
-      localStorage.removeItem("currentUser");
-      window.location.href = "index.html";
+      localStorage.setItem("currentUser", user);
+      window.location.href = "index3.html";
     }
   </script>
 </body>
