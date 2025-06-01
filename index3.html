@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Éditeur HTML</title>
+  <style>
+    :root {
+      --bg-light: #f0f8ff;
+      --bg-dark: #121212;
+      --text-light: #000;
+      --text-dark: #fff;
+      --code-bg-light: #e6f0ff;
+      --code-bg-dark: #1e1e1e;
+      --primary: #007bff;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      font-family: monospace;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    #top {
+      display: flex;
+      flex: 1;
+    }
+
+    textarea {
+      width: 50%;
+      height: 100%;
+      padding: 10px;
+      border: none;
+      resize: none;
+      outline: none;
+      background-color: var(--code-bg-light);
+      color: inherit;
+    }
+
+    body.dark textarea {
+      background-color: var(--code-bg-dark);
+      color: var(--text-dark);
+    }
+
+    iframe {
+      width: 50%;
+      height: 100%;
+      border: none;
+      background-color: white;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+      background: var(--primary);
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: white;
+      color: var(--primary);
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e0e0e0;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="top">
+    <textarea id="code"><!-- Tape ton code HTML ici -->
+<h1>Bienvenue !</h1>
+<p>Aperçu à droite.</p></textarea>
+    <iframe id="preview"></iframe>
+  </div>
+
+  <div id="controls">
+    <button onclick="run()">▶️ Run</button>
+    <button onclick="download()">📥 Télécharger</button>
+    <label>
+      <button>📂 Importer</button>
+      <input type="file" id="import" accept=".html" onchange="importFile(event)">
+    </label>
+    <button onclick="toggleTheme()">🌓 Mode Sombre</button>
+    <button onclick="logout()">🚪 Déconnexion</button>
+  </div>
+
+  <script>
+    // Vérifie si l'utilisateur est connecté
+    const user = localStorage.getItem("currentUser");
+    if (!user) {
+      alert("Tu dois être connecté pour utiliser l’éditeur.");
+      location.href = "index1.html";
+    }
+
+    const textarea = document.getElementById("code");
+    const preview = document.getElementById("preview");
+
+    function run() {
+      preview.srcdoc = textarea.value;
+      localStorage.setItem("saved_" + user, textarea.value);
+    }
+
+    function download() {
+      const blob = new Blob([textarea.value], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'mon-code.html';
+      a.click();
+    }
+
+    function importFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        textarea.value = e.target.result;
+        run();
+      };
+      reader.readAsText(file);
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+
+    function logout() {
+      localStorage.removeItem("currentUser");
+      alert("Tu es déconnecté !");
+      location.href = "index1.html";
+    }
+
+    // Appliquer le thème au chargement
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    // Charger le code sauvegardé
+    const savedCode = localStorage.getItem("saved_" + user);
+    if (savedCode) {
+      textarea.value = savedCode;
+    }
+
+    run();
+  </script>
+</body>
+</html>
